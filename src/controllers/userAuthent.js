@@ -39,41 +39,47 @@ const register = async (req,res)=>{
 }
 
 
-const login = async (req,res)=>{
+const login = async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
 
-    try{
-        const {emailId, password} = req.body;
+    if (!emailId || !password) throw new Error("Invalid Credentials");
 
-        if(!emailId)
-            throw new Error("Invalid Credentials");
-        if(!password)
-            throw new Error("Invalid Credentials");
+    const user = await User.findOne({ emailId });
+    if (!user) throw new Error("Invalid Credentials");
 
-        const user = await User.findOne({emailId});
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) throw new Error("Invalid Credentials");
 
-        const match = await bcrypt.compare(password,user.password);
+    const reply = {
+      firstName: user.firstName,
+      emailId: user.emailId,
+      _id: user._id,
+      role: user.role,
+    };
 
-        if(!match)
-            throw new Error("Invalid Credentials");
+    const token = jwt.sign(
+      { _id: user._id, emailId: emailId, role: user.role },
+      process.env.JWT_KEY,
+      { expiresIn: 60 * 60 }
+    );
 
-        const reply = {
-            firstName: user.firstName,
-            emailId: user.emailId,
-            _id: user._id,
-            role:user.role,
-        }
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+      path: "/",
+      maxAge: 60 * 60 * 1000,
+    });
 
-        const token =  jwt.sign({_id:user._id , emailId:emailId, role:user.role},process.env.JWT_KEY,{expiresIn: 60*60});
-        res.cookie('token',token,{maxAge: 60*60*1000});
-        res.status(201).json({
-            user:reply,
-            message:"Loggin Successfully"
-        })
-    }
-    catch(err){
-        res.status(401).send("Error: "+err);
-    }
-}
+    res.status(200).json({
+      user: reply,
+      message: "Login Successfully",
+    });
+  } catch (err) {
+    res.status(401).send("Error: " + err.message);
+  }
+};
 
 
 // logOut feature
@@ -90,8 +96,15 @@ const logout = async(req,res)=>{
     //    Token add kar dung Redis ke blockList
     //    Cookies ko clear kar dena.....
 
-    res.cookie("token",null,{expires: new Date(Date.now())});
-    res.send("Logged Out Succesfully");
+    res.cookie("token", "", {
+  httpOnly: true,
+  secure: true,
+  sameSite: "None",
+  path: "/",
+  expires: new Date(0),
+});
+res.send("Logged Out Successfully");
+
 
     }
     catch(err){

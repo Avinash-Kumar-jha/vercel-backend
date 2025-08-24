@@ -17,8 +17,10 @@ const cors = require('cors')
 // });
 
 app.use(cors({
-    origin: 'https://vercel-frontend-eight-ivory.vercel.app/signup',
-    credentials: true 
+ origin: [
+        "https://vercel-frontend-1-one.vercel.app", // tera frontend ka sahi domain
+        "http://localhost:5173" // dev ke liye
+    ],    credentials: true 
 }))
 
 

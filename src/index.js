@@ -12,11 +12,15 @@ const videoRouter = require("./routes/videoCreator");
 const cors = require('cors')
 
 // console.log("Hello")
+// app.get("/", (req, res) => {
+//     res.send("🚀 Backend is running successfully! Available routes: /user, /problem, /submission, /ai, /video");
+// });
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://vercel-frontend-eight-ivory.vercel.app/signup',
     credentials: true 
 }))
+
 
 app.use(express.json());
 app.use(cookieParser());

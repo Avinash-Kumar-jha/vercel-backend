@@ -19,7 +19,7 @@ const cors = require('cors')
 app.use(cors({
  origin: [
         "https://vercel-frontend-1-one.vercel.app", // tera frontend ka sahi domain
-        "http://localhost:5173",
+        "https://astounding-daifuku-93e8ba.netlify.app/signup",
   "https://majestic-cassata-614c30.netlify.app"
   // dev ke liye
     ],    credentials: true 
